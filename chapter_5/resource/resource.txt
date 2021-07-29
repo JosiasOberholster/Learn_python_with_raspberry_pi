@@ -1,0 +1,25 @@
+**********************************************
+SPRITES
+**********************************************
+
+Name: lidia.npg
+URL: https://opengameart.org/sites/default/files/styles/medium/public/lidia.png
+
+Name: flame.png
+URL: https://opengameart.org/sites/default/files/flame.png
+
+
+
+**********************************************
+SOUND
+**********************************************
+Name: qubodup-cfork-ccby3-jump.ogg
+URL : https://opengameart.org/sites/default/files/qubodup-cfork-ccby3-jump.ogg
+
+
+
+**********************************************
+IMAGES
+**********************************************
+Name: background.png
+URL: https://opengameart.org/sites/default/files/background.zip
