@@ -23,3 +23,12 @@ IMAGES
 **********************************************
 Name: background.png
 URL: https://opengameart.org/sites/default/files/background.zip
+
+Note: All five images was put together to create one image
+Final Image Name: LandingPageBackground.png 
+Name: parallax-mountain-bg.png
+Name: parallax-mountain-foreground-trees.png
+Name: parallax-mountain-montain-far.png
+Name: parallax-mountain-mountains.png
+Name: parallax-mountain-trees.png
+URL: https://opengameart.org/content/mountain-at-dusk-background

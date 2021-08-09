@@ -3,6 +3,52 @@ import sys
 from pygame.locals import *
 from random import randint
 
+class Landing_Page():
+    #The class that holds the details to allow the user to start a game, 
+    #change the level difficulty and quit the game
+
+    def __init__(self, select_start_number, select_min_number, select_max_number):
+        self.current_selected_number = select_start_number
+        self.min_number = select_min_number
+        self.max_number = select_max_number
+
+    def Select_Options(self, currentKeyValue):
+        #Function to see what the current option is and navigate to the correct one
+        if currentKeyValue == 'down':
+            if self.current_selected_number != self.max_number:
+                self.current_selected_number += 1
+        if currentKeyValue == 'up':
+            if self.current_selected_number != self.min_number:
+                self.current_selected_number -= 1
+        return self.current_selected_number
+
+    def Update_Options(self, new_selected_option):
+        #This will update the current selected option to the new one
+        # if new_selected_option != self.current_selected_number:
+        if new_selected_option == 1:
+            screen.fill((0, 0, 0))
+            screen.blit(landing_page_image, (0, 0))
+            screen.blit(pygame.image.load(landing_page_logo), (190, 45))
+            screen.blit(pygame.image.load(landing_page_start_selected), (216, 166))
+            screen.blit(pygame.image.load(landing_page_difficulty), (216, 218))
+            screen.blit(pygame.image.load(landing_page_quit), (216, 271))
+        elif new_selected_option == 2:
+            screen.fill((0, 0, 0))
+            screen.blit(landing_page_image, (0, 0))
+            screen.blit(pygame.image.load(landing_page_logo), (190, 45))
+            screen.blit(pygame.image.load(landing_page_start), (216, 166))
+            screen.blit(pygame.image.load(landing_page_difficulty_selected), (216, 218))
+            screen.blit(pygame.image.load(landing_page_quit), (216, 271))
+        elif new_selected_option == 3:
+            screen.fill((0, 0, 0))
+            screen.blit(landing_page_image, (0, 0))
+            screen.blit(pygame.image.load(landing_page_logo), (190, 45))
+            screen.blit(pygame.image.load(landing_page_start), (216, 166))
+            screen.blit(pygame.image.load(landing_page_difficulty), (216, 218))
+            screen.blit(pygame.image.load(landing_page_quit_selected), (216, 271))
+        pygame.display.update()
+
+
 class Player(pygame.sprite.Sprite):
     #The class that holds the main player, and controls
     #how they jump. nb. The player doesn't move left or right,
@@ -140,7 +186,8 @@ class Fireball(pygame.sprite.Sprite):
         #the screen and give them a random speed
         self.y = 0
         self.speed_y = randint(fireball_low_speed, fireball_high_speed)
-        self.x = randint(0, screen_x)
+        #Set closest left side distance that the fireball will start 
+        self.x = randint(80, screen_x)
         self.rect.topleft = self.x, self.y
 
     def move_x(self, dist):
@@ -194,6 +241,17 @@ fireball_high_speed = 3
 fireball_image = "sprites/flame.png"
 jump_sound = "sound/qubodup-cfork-ccby3-jump.ogg"
 background_image = "images/background.png"
+landing_page_background = "images/LandingPageBackground.png"
+landing_page_logo = "images/LandingPageLogo.png"
+landing_page_start = "images/LandingPageStart.png"
+landing_page_start_selected = "images/LandingPageStartSelected.png"
+landing_page_difficulty = "images/LandingPageDifficulty.png"
+landing_page_difficulty_selected = "images/LandingPageDifficultySelected.png"
+landing_page_quit = "images/LandingPageQuit.png"
+landing_page_quit_selected = "images/LandingPageQuitSelected.png"
+landing_page_start_number = 1
+landing_page_min_selection_number = 1
+landing_page_max_selection_number = 3
 
 #initialise pygame.mixer
 pygame.mixer.pre_init(44100, -16, 8, 2048)
@@ -211,74 +269,115 @@ if len(sys.argv) > 1:
         level = f.readlines()
 
 #initialise variables
+start = False
 finished = False
+complete_loading = False
 clock = pygame.time.Clock()
 player = Player(player_spawn_x, player_spawn_y, 20, 30)
 player_plain = pygame.sprite.RenderPlain(player)
 world = World(level, 30, platform_colour, goal_colour)
 doom = Doom(fireball_number, 10, doom_colour)
+landing_page = Landing_Page(landing_page_start_number, landing_page_min_selection_number, landing_page_max_selection_number)
 
 #set the speed
 clock.tick(20)
 
+#setup the landing page
+landing_page_image = pygame.transform.scale(pygame.image.load(landing_page_background), (screen_x, screen_y)).convert()
+
 #setup the background
-background = pygame.transform.scale(pygame.image.load(background_image), (screen_x, screen_y)).convert()
+background = pygame.transform.scale(pygame.image.load(background_image), (screen_x, screen_y))
 bg_1_x = -100
 bg_2_x = screen_x - 100
 
 while not finished:
-    #black screen
-    screen.fill((0, 0, 0))
+    #render the frame
+    if not complete_loading:
+        screen.fill((0, 0, 0))
+        screen.blit(landing_page_image, (0, 0))
+        screen.blit(pygame.image.load(landing_page_logo), (190, 45))
+        screen.blit(pygame.image.load(landing_page_start_selected), (216, 166))
+        screen.blit(pygame.image.load(landing_page_difficulty), (216, 218))
+        screen.blit(pygame.image.load(landing_page_quit), (216, 271))
+        complete_loading = True
 
     #check events
     for event in pygame.event.get():
         if event.type == QUIT:
             finished = True
-
-    #check which keys are held
-    key_state = pygame.key.get_pressed()
-    if key_state[K_LEFT]:
-        world.move(2)
-        doom.move(2)
-        bg_1_x = bg_1_x + 1
-        bg_2_x = bg_2_x + 1
-        if bg_1_x > screen_x:
-            bg_1_x = -screen_x
-        if bg_2_x > screen_x:
-            bg_2_x = -screen_x
-    elif key_state[K_RIGHT]:
-        world.move(-2)
-        doom.move(-2)
-        bg_1_x = bg_1_x - 1
-        bg_2_x = bg_2_x - 1
-        if bg_1_x < -screen_x:
-            bg_1_x = screen_x
-        if bg_2_x < -screen_x:
-            bg_2_x = screen_x
-    if key_state[K_SPACE]:
-        player.jump(jump_speed)
-
-    #move the player with gravity
-    player.move_y()
-
-    #render the frame
-    screen.blit(background, (bg_1_x, 0))
-    screen.blit(background, (bg_2_x, 0))
-    player_plain.draw(screen)
-    world.update(screen)
-    doom.update(screen)
-
+        if event.type == KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                new_option = landing_page.Select_Options("down")
+                landing_page.Update_Options(new_option)    
+            if event.key == pygame.K_UP:
+                new_option = landing_page.Select_Options('up')
+                landing_page.Update_Options(new_option)
+            if event.key == pygame.K_SPACE:
+                if landing_page.current_selected_number == 1:
+                    start = True
+                elif landing_page.current_selected_number == 2:
+                    print('difficulty')
+                elif landing_page.current_selected_number == 3:
+                    print('quit')
+    
     #update the display
     pygame.display.update()
+    
+    while start:
+        #black screen
+        screen.fill((0, 0, 0))
 
-    #check if the player is dead
-    if doom.collided(player.rect):
-        print("You Lose!")
-        finished = True
+        #check events
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                finished = True
 
-    #check if the player has completed the level
-    if world.at_goal(player.rect):
-        print("Winner!")
-        finished = True
+        #check which keys are held
+        key_state = pygame.key.get_pressed()
+        if key_state[K_LEFT]:
+            world.move(2)
+            doom.move(2)
+            bg_1_x = bg_1_x + 1
+            bg_2_x = bg_2_x + 1
+            if bg_1_x > screen_x:
+                bg_1_x = -screen_x
+            if bg_2_x > screen_x:
+                bg_2_x = -screen_x
+        elif key_state[K_RIGHT]:
+            world.move(-2)
+            doom.move(-2)
+            bg_1_x = bg_1_x - 1
+            bg_2_x = bg_2_x - 1
+            if bg_1_x < -screen_x:
+                bg_1_x = screen_x
+            if bg_2_x < -screen_x:
+                bg_2_x = screen_x
+        if key_state[K_SPACE]:
+            player.jump(jump_speed)
 
-    #set the speed
+        #move the player with gravity
+        player.move_y()
+
+        #render the frame
+        screen.blit(background, (bg_1_x, 0))
+        screen.blit(background, (bg_2_x, 0))
+        player_plain.draw(screen)
+        world.update(screen)
+        doom.update(screen)
+
+        #update the display
+        pygame.display.update()
+
+        #check if the player is dead
+        if doom.collided(player.rect):
+            print("You Lose!")
+            start = False
+            finished = True
+
+        #check if the player has completed the level
+        if world.at_goal(player.rect):
+            print("Winner!")
+            start = False
+            finished = True
+
+        #set the speed
